@@ -33,3 +33,13 @@ class Image(models.Model):
         super(Image,self).save(*args,**kwargs)
 
 
+
+
+class Temp_User(models.Model):
+    ip_address = models.CharField(max_length=15)
+    count = models.IntegerField(default=0)
+    time_stamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False )
+
+
+    def __str__(self):
+        return self.ip_address

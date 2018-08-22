@@ -2,6 +2,7 @@ from django.shortcuts import render , redirect , HttpResponseRedirect
 from django.contrib.auth import authenticate , login , logout
 from .forms import UserLoginForm , UserRegisterForm
 from django.views import View
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -13,18 +14,26 @@ class LoginView(View):
         "title" : "Login" ,})
 
     def post(self,request):
-        form = UserLoginForm(request.POST or None)
+        # form = UserLoginForm(request.POST or None)
 
-        if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            user = authenticate(username = username , password = password)
-            login(request , user)
-            return redirect("/")
-        return render(request , "accounts/form.html" ,
-                {
-                "form" : form,
-                "title" : "Login" ,})
+        # if form.is_valid():
+        #     username = form.cleaned_data.get("username")
+        #     password = form.cleaned_data.get("password")
+        #     user = authenticate(username = username , password = password)
+        #     login(request , user)
+        #     return redirect("/")
+        # return render(request , "accounts/form.html" ,
+        #         {
+        #         "form" : form,
+        #         "title" : "Login" ,})
+
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username = username , password = password)
+
+        response = login(request ,user)
+
+        return JsonResponse({'response':response})
 
 
 class RegisterView(View):
@@ -55,5 +64,6 @@ class RegisterView(View):
 class LogoutView(View):
     def get(self,request):
         logout(request)
-        return HttpResponseRedirect("/")
+        # return HttpResponseRedirect("/")
+        return JsonResponse({'Response':'Logout Successfully'})
 
