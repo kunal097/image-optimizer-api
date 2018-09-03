@@ -28,7 +28,10 @@ def compress(image):
         # print('###########3')
         # print(path)
         # path = '/'.join(path)
-    path = image.local_path.replace('upload','output')
+    if 'upload' in image.local_path:
+        path = image.local_path.replace('upload','output')
+    else:
+        path = str(image.local_path)+'/output'
 
     img.save(path , optimize=True , quality=int(image.quality),progressive=1,progression=1)
 

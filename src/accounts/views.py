@@ -4,6 +4,9 @@ from .forms import UserLoginForm , UserRegisterForm
 from django.views import View
 from django.http import JsonResponse
 
+from optimizer.models import AuthToken
+import random , string
+
 # Create your views here.
 
 class LoginView(View):
@@ -14,26 +17,19 @@ class LoginView(View):
         "title" : "Login" ,})
 
     def post(self,request):
-        # form = UserLoginForm(request.POST or None)
+        form = UserLoginForm(request.POST or None)
 
-        # if form.is_valid():
-        #     username = form.cleaned_data.get("username")
-        #     password = form.cleaned_data.get("password")
-        #     user = authenticate(username = username , password = password)
-        #     login(request , user)
-        #     return redirect("/")
-        # return render(request , "accounts/form.html" ,
-        #         {
-        #         "form" : form,
-        #         "title" : "Login" ,})
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(username = username , password = password)
+            login(request , user)
+            return redirect("/")
+        return render(request , "accounts/form.html" ,
+                {
+                "form" : form,
+                "title" : "Login" ,})
 
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username = username , password = password)
-
-        response = login(request ,user)
-
-        return JsonResponse({'response':response})
 
 
 class RegisterView(View):
@@ -51,9 +47,19 @@ class RegisterView(View):
             password = form.cleaned_data.get("password")
             user.set_password(password)
             user.save()
+
+            api = AuthToken()
+            key=''.join([random.choice(string.ascii_letters
+            + string.digits) for n in range(20)])
+            # api.id=obj.pk
+            api.user=user
+            api.api_key= key
+            auth_api=api.save()
+
+
             new_user = authenticate(username=user.username , password=password)
             login(request , new_user)
-            return redirect("/accounts/login")
+            return render(request, "auth.html", {'AuthToken':key})
 
         return render(request , "accounts/form.html",{
             "title" : "Register",

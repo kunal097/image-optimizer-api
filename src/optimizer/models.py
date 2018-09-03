@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import URLValidator
 from image_optmizer.settings import MEDIA_ROOT
 import requests
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -19,7 +20,10 @@ class Image(models.Model):
 
 
     def save(self,*args,**kwargs):
-        r = requests.get(self.url)
+        try:
+            r = requests.get(self.url)
+        except:
+            pass
 
         if r.status_code == 200:
             self.local_path = MEDIA_ROOT + '/upload/' + self.url.split('/')[-1]
@@ -43,3 +47,11 @@ class Temp_User(models.Model):
 
     def __str__(self):
         return self.ip_address
+
+
+class AuthToken(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    api_key = models.CharField(max_length=20,primary_key=True)
+
+    def __str__(self):
+        return self.api_key
